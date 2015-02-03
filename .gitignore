@@ -1,0 +1,9 @@
+*.pyc
+stibd/local_settings.py
+stibd/static/books/
+logs/
+*.py~
+*.html~
+*.js~
+*.orig
+*.log

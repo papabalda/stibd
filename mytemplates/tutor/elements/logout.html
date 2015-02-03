@@ -1,0 +1,15 @@
+{% if messages %}
+	<div style="margin-left:355px; width:245px; clear:both; text-align:center; font-weight:normal; color:#F90">
+	{% for message in messages %}
+		{{ message }}<br/>
+	{% endfor %}
+	</div>
+{% endif %}
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+{% if user.is_authenticated %}
+<div align="right">
+  <p><font size="4" color="white">Bienvenido Usuario {{user.username}}</font></p>
+</div>  
+{% endif %}

@@ -1,0 +1,19 @@
+﻿{% if messages %}
+	<div style="margin-left:355px; width:245px; clear:both; text-align:center; font-weight:normal; color:#F90">
+	{% for message in messages %}
+		{{ message }}<br/>
+	{% endfor %}
+	</div>
+{% endif %}
+
+{% if not user.is_authenticated %}
+  <form action="/tutor/login/" align="right" method="post">
+      {% csrf_token %}
+      <input type="text" name="login" placeholder="Nombre de Usuario" style="height:33px; padding:6px 12px" id="login"/>
+      <input type="password" name="password" placeholder="Contraseña" style="height:33px; padding:6px 12px" id="password"/>
+  <button type="submit" class="btn btn-theme">Entrar</button>
+  </form>
+{% else %}
+    {% csrf_token %}
+	{% include "tutor/elements/logout.html" %}
+{% endif %}
