@@ -169,6 +169,7 @@ LOGGING = {
     }
 }
 # LOCAL SETTINGS
+# Soon
 '''
 try:
     from local_settings import *
