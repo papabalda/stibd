@@ -15,41 +15,23 @@ from django.conf import settings
 from nltk.tokenize import sent_tokenize, word_tokenize, wordpunct_tokenize
 from nltk.tag import pos_tag
 from nltk.chunk import ne_chunk
-from tutor.preprocessing import *
+#Preprocesamiento
+from pre_procesamiento.functions import *
+#from pre_procesamiento.preprocessing import *
 
-def nltk_call(big_text):
-	'''
-	#Vamos a hacer varias pruebas
-	print "algo ", sent_tokenize(big_text)
-	print "algo ", sent_tokenize("Hello Mr. Anderson. How you doing?")
-	#
-	print "algo ", word_tokenize("This is NLTK")
-	print "algo ", word_tokenize("What's up?")
-	#
-	print "algo punct ", wordpunct_tokenize("What's up?")
-	#Buscar las tag list 
-	words = word_tokenize("And now for something completely different")
-	print "pos tag ", pos_tag(words)
-	#Chunking
-	print "algo ", ne_chunk(pos_tag(word_tokenize("My name is John Smith.")))
-	'''
-	text = """What can I say about this place. The staff of the restaurant is nice and the eggplant is not bad. Apart from that, very uninspired food, lack of atmosphere and too expensive. I am a staunch vegetarian and was sorely dissapointed with the veggie options on the menu. Will be the last time I visit, I recommend others to avoid."""
-	splitter = Splitter()
-	postagger = POSTagger()
-	splitted_sentences = splitter.split(text)
-	print "\n", splitted_sentences
-	pos_tagged_sentences = postagger.pos_tag(splitted_sentences)
-	print "\n", pos_tagged_sentences
-
-	dicttagger = DictionaryTagger([ 'C:/Users/Carlo/Desktop/stibd/tutor/positive.yml', 'C:/Users/Carlo/Desktop/stibd/tutor/negative.yml'])
-	dict_tagged_sentences = dicttagger.tag(pos_tagged_sentences)	
-	print dict_tagged_sentences
-	print "score, ", sentiment_score(dict_tagged_sentences)
-	return True
-	
 def home(request):
-	nltk = nltk_call("Hello SF Python. This is NLTK")
-	return render_to_response('tutor/index1.html', RequestContext(request))
+	#fundamentos_er_ere convert_pdf_to_txt
+	#pdf = pdf_to_text(settings.STATIC_ROOT+"/books/example.pdf")
+	#pdf = getPDFText(settings.STATIC_ROOT+"/books/example.pdf")
+	#print "ok ", pdf
+	#DEscomentar pdf2 luego
+	#pdf2 = pdf_to_text(settings.STATIC_ROOT+"/books/example.pdf")
+	#print "ok2 ", pdf2
+	
+	#nltk = nltk_call(pdf2) A rare black squirrel has become a regular visitor to a suburban garden  --- We saw a little strange dog
+	nltk = nltk_call("A rare squirrel has become a regular visitor to a suburban garden.")
+	# Para hacer pruebas usar index.html, del resto usar index1.html
+	return render_to_response('tutor/index.html', RequestContext(request))
 	
 def login_call(request):
 	message = '¡Usuario ya se encuentra conectado!'

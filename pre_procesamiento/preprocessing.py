@@ -99,6 +99,4 @@ class DictionaryTagger(object):
             if sentiment == 'positive': return 1
             if sentiment == 'negative': return -1
             return 0
- 
-        def sentiment_score(review):    
-            return sum ([value_of(tag) for sentence in dict_tagged_sentences for token in sentence for tag in token[2]])		
+	
