@@ -18,7 +18,61 @@ from nltk.chunk import ne_chunk
 #Preprocesamiento
 from pre_procesamiento.functions import *
 #from pre_procesamiento.preprocessing import *
-
+from SPARQLWrapper import SPARQLWrapper, JSON
+ 
+def sparql_call():
+	#http://localhost:3030/ds/query   http://dbpedia.org/sparql ab: <http://learningsparql.com/ns/addressbook#>
+	sparql = SPARQLWrapper("http://localhost:3030/ds/query")
+	'''
+	sparql.setQuery("""
+	PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+	SELECT ?label
+	WHERE { <http://dbpedia.org/resource/Asturias> rdfs:label ?label }
+	""")
+	'''
+	sparql.setQuery("""
+	PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+	SELECT * {?s ?p ?o}
+	""")	
+	sparql.setReturnFormat(JSON)
+	results = sparql.query().convert()
+	 
+	for result in results["results"]["bindings"]:
+		try:
+			print(result["s"]["value"],result["p"]["value"],result["o"]["value"]) 
+		except:
+			print "no pude leer esto"
+		
+# # # TODO Funcion para interpretar las preguntas realizadas y llevarlas a tripletas a cnsultar. Luego usar sparql call y 
+# #        finalmente devolver la respuesta
+		
+def sparql_call2():
+	#http://localhost:3030/ds/query   http://dbpedia.org/sparql ab: <http://learningsparql.com/ns/addressbook#>
+	sparql = SPARQLWrapper("http://localhost:3030/ds/query")
+	try:
+		sparql.setQuery("""PREFIX ab: <http://www.w3.org/2000/01/rdf-schema#> 
+		SELECT ?craigEmail
+		WHERE { ab:craig ab:email ?craigEmail . }	
+		""")	
+		print "query ", sparql.queryString	
+		ok = True
+	except Exception as e:
+		print "ok ",e.message	
+		ok = False
+	
+	if ok:
+		sparql.setReturnFormat(JSON)
+		try:
+			results = sparql.query().convert()
+			 
+			for result in results["results"]["bindings"]:
+				try:
+					print(result["craigEmail"]["value"]) 
+				except:
+					print "no pude leer esto"
+		except Exception as e:
+			print "ok ",e.message			
+			
 def home(request):
 	#fundamentos_er_ere convert_pdf_to_txt
 	#pdf = pdf_to_text(settings.STATIC_ROOT+"/books/example.pdf")
@@ -29,7 +83,10 @@ def home(request):
 	#print "ok2 ", pdf2
 	
 	#nltk = nltk_call(pdf2) A rare black squirrel has become a regular visitor to a suburban garden  --- We saw a little strange dog
-	nltk = nltk_call("A rare squirrel has become a regular visitor to a suburban garden.")
+	
+	# Comentando por ahora
+	#nltk = nltk_call("A rare squirrel has become a regular visitor to a suburban garden.")
+	sparql_call2()
 	# Para hacer pruebas usar index.html, del resto usar index1.html
 	return render_to_response('tutor/index.html', RequestContext(request))
 	
