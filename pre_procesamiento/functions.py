@@ -53,6 +53,38 @@ def pdf_to_text(filename):
 		print(filename,"Warning: could not extract text from pdf file.")
 		return ''
 
+def to_file(text, filename):
+	file = open(filename, 'w')
+	file.write(text)
+	print "creado archivo ", filename
+	file.close()
+	
+def to_arff(filename):
+	text = ''
+	file = open('LARCTREN.txt', 'r')
+	arff_file = open(filename, 'w')
+	data = file.readlines()
+	for line in data:
+		word_tuple_list = line.split(')')
+		for tuple in word_tuple_list:
+			if 'stopWord' not in tuple:
+				stuff = tuple.split(',')
+				try:
+					tuple_index = word_tuple_list.index(tuple)
+					if tuple_index == 0:
+						lemma = stuff[1]
+					else:
+						lemma = stuff[2]
+				except:
+					lemma = ''
+				if "'.'" not in lemma:
+					text = text + lemma + ' '
+		text = text + '\n'	
+	arff_file.write(text)
+	print "creado archivo ", filename
+	file.close()
+	arff_file.close()
+	
 def nltk_call(big_text):
 	'''
 	#Vamos a hacer varias pruebas
@@ -78,7 +110,7 @@ def nltk_call(big_text):
 	# Chunk sequences of DT, JJ, NN # Chunk prepositions followed by NP # Chunk verbs and their arguments
 	cp = nltk.RegexpParser(grammar, loop=2)
 	result = cp.parse(sentence)
-	result.draw()
+	#result.draw()
 	print "algo ", result
 	#print "algo postag", pos_tag(word_tokenize(big_text))
 	text = "The increase will cover all kinds of wheat including durum and milling wheat."
@@ -88,10 +120,12 @@ def nltk_call(big_text):
 	splitted_sentences = splitter.split(big_text)
 	#print "\n", splitted_sentences
 	pos_tagged_sentences = postagger.pos_tag(splitted_sentences)
-	#print "\n", pos_tagged_sentences
+	#print "\n", pos_tagged_sentences cleaner positive
 
-	dicttagger = DictionaryTagger([ settings.YML_ROOT+'positive.yml', settings.YML_ROOT+'negative.yml'])
+	dicttagger = DictionaryTagger([ settings.YML_ROOT+'cleaner.yml'])
 	dict_tagged_sentences = dicttagger.tag(pos_tagged_sentences)	
+	to_file('\n'.join(map(str, dict_tagged_sentences)), "LARCTREN.txt")
+	to_arff("LARCTREN.arff")
 	#print dict_tagged_sentences
 	return True
 

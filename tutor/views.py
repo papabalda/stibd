@@ -19,8 +19,121 @@ from nltk.chunk import ne_chunk
 from pre_procesamiento.functions import *
 #from pre_procesamiento.preprocessing import *
 from SPARQLWrapper import SPARQLWrapper, JSON
+import quepy
+
+sparql = SPARQLWrapper("http://localhost:3030/ds/query")
+quepy_stibd = quepy.install("quepy_stibd")
  
-def sparql_call():
+def sparql_call(query, target):
+	#http://localhost:3030/ds/query   http://dbpedia.org/sparql ab: <http://learningsparql.com/ns/addressbook#>
+	#Ya deberia estar abierto so
+	if sparql is None:
+		sparql = SPARQLWrapper("http://localhost:3030/ds/query")
+	
+	sparql.setQuery(query)
+	sparql.setReturnFormat(JSON)
+	results = sparql.query().convert()
+	target = target.replace("?", "") 
+	for result in results["results"]["bindings"]:
+		try:
+			first = result[target]["value"]
+			print(result[target]["value"]) 
+		except Exception as e:
+			#first = None
+			print "no pude leer esto", e.message
+
+
+	#return first, results
+		
+# # # TODO Funcion para interpretar las preguntas realizadas y llevarlas a tripletas a cnsultar. Luego usar sparql call y 
+# #        finalmente devolver la respuesta
+
+
+def question_process(text):#_ajax
+	if text is None:
+		return False
+	else:
+		quepy_stibd = quepy.install("quepy_stibd")
+		target, query, metadata = quepy_stibd.get_query(text)
+		print target, query, metadata	
+		target, query, metadata = quepy_stibd.get_query("where in the world is the Eiffel Tower?")
+		print target, query, metadata	
+		target, query, metadata = quepy_stibd.get_query("List Microsoft software")#Which is Cindy's email? Who is Jon Snow?
+		print target, query, metadata			
+	return True
+
+'''
+def question_process(text):#_ajax
+	if text is None:
+		return False
+	else:
+		if what_question(text):
+			query = text_to_query()
+			answer = sparql_call(query)
+			print answer
+		if who_question(text):
+			query = text_to_query()
+			answer = sparql_call(query)
+			print answer
+		if where_question(text):
+			query = text_to_query()
+			answer = sparql_call(query)
+			print answer			
+		if where_question(text):
+			query = text_to_query()
+			answer = sparql_call(query)
+			print answer	
+	return True
+'''		
+
+def my_ajax(request):
+	if request.is_ajax():
+		dato = request.POST.get('dato', None)
+		try:
+			print dato
+		except:
+			raise Http404
+	else:
+		raise Http404
+
+def question_ajax(request):
+	if request.is_ajax():
+		question = request.POST.get('question', None)
+		try:
+			# Variable global para mantener la conexion a quepy.. Tal vez no sea necesario
+			if quepy_stibd is None:
+				quepy_stibd = quepy.install("quepy_stibd")	
+			target, query, metadata = quepy_stibd.get_query(question)
+			# run query
+			try:
+				first, results = sparql_call(target,query)
+			except Exception as e:
+				print e.message
+				raise Http404
+		except:
+			raise Http404
+	else:
+		raise Http404
+		
+def question(question):
+	try:
+		# Variable global para mantener la conexion a quepy.. Tal vez no sea necesario
+		if quepy_stibd is None:
+			quepy_stibd = quepy.install("quepy_stibd")	
+		target, query, metadata = quepy_stibd.get_query(question)
+		print query
+		# run query
+		try:
+			sparql_call(query,target)
+			
+		except Exception as e:
+			print e.message
+			raise Http404
+	except Exception as e:
+		print "errorrr", e.message
+		raise Http404
+		
+def sparql_call2():
 	#http://localhost:3030/ds/query   http://dbpedia.org/sparql ab: <http://learningsparql.com/ns/addressbook#>
 	sparql = SPARQLWrapper("http://localhost:3030/ds/query")
 	'''
@@ -30,25 +143,6 @@ def sparql_call():
 	WHERE { <http://dbpedia.org/resource/Asturias> rdfs:label ?label }
 	""")
 	'''
-	sparql.setQuery("""
-	PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-	SELECT * {?s ?p ?o}
-	""")	
-	sparql.setReturnFormat(JSON)
-	results = sparql.query().convert()
-	 
-	for result in results["results"]["bindings"]:
-		try:
-			print(result["s"]["value"],result["p"]["value"],result["o"]["value"]) 
-		except:
-			print "no pude leer esto"
-		
-# # # TODO Funcion para interpretar las preguntas realizadas y llevarlas a tripletas a cnsultar. Luego usar sparql call y 
-# #        finalmente devolver la respuesta
-		
-def sparql_call2():
-	#http://localhost:3030/ds/query   http://dbpedia.org/sparql ab: <http://learningsparql.com/ns/addressbook#>
-	sparql = SPARQLWrapper("http://localhost:3030/ds/query")
 	try:
 		sparql.setQuery("""PREFIX ab: <http://www.w3.org/2000/01/rdf-schema#> 
 		SELECT ?craigEmail
@@ -78,15 +172,17 @@ def home(request):
 	#pdf = pdf_to_text(settings.STATIC_ROOT+"/books/example.pdf")
 	#pdf = getPDFText(settings.STATIC_ROOT+"/books/example.pdf")
 	#print "ok ", pdf
-	#DEscomentar pdf2 luego
-	#pdf2 = pdf_to_text(settings.STATIC_ROOT+"/books/example.pdf")
+	#DEscomentar pdf2 luego Entity relationship Concepts.pdf
+	pdf2 = pdf_to_text(settings.STATIC_ROOT+"/books/Entity relationship Concepts.pdf")
 	#print "ok2 ", pdf2
 	
-	#nltk = nltk_call(pdf2) A rare black squirrel has become a regular visitor to a suburban garden  --- We saw a little strange dog
+	nltk = nltk_call(pdf2) #A rare black squirrel has become a regular visitor to a suburban garden  --- We saw a little strange dog
 	
 	# Comentando por ahora
 	#nltk = nltk_call("A rare squirrel has become a regular visitor to a suburban garden.")
-	sparql_call2()
+	#sparql_call2()
+	#ok = question_process("What is a subclass?")
+	#ok = question("What is a subclass?")
 	# Para hacer pruebas usar index.html, del resto usar index1.html
 	return render_to_response('tutor/index.html', RequestContext(request))
 	

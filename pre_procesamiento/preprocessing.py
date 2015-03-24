@@ -1,6 +1,17 @@
 ﻿import nltk
 from yaml import load, dump
 
+def lemmatizer(lmtzr, word, postag):
+    try:    
+        if 'VB' in postag:
+            #print postag
+            return lmtzr.lemmatize(word,'v')
+        else:
+            return lmtzr.lemmatize(word)		
+    except Exception as e:
+        print "lemma error ", e.message
+        return word
+
 class Splitter(object):
     def __init__(self):
         self.nltk_splitter = nltk.data.load('tokenizers/punkt/english.pickle')
@@ -15,7 +26,15 @@ class Splitter(object):
         sentences = self.nltk_splitter.tokenize(text)
         tokenized_sentences = [self.nltk_tokenizer.tokenize(sent) for sent in sentences]
         return tokenized_sentences
- 
+
+    def sentence_split(self, text):
+        """
+        input format: a paragraph of text
+        output format: a list of sentences.
+            e.g.: ['this is a sentence'], ['this is another one']]
+        """
+        sentences = self.nltk_splitter.tokenize(text)
+        return sentences 
  
 class POSTagger(object):
     def __init__(self):
@@ -33,7 +52,8 @@ class POSTagger(object):
  
         pos = [nltk.pos_tag(sentence) for sentence in sentences]
         #adapt format
-        pos = [[(word, word, [postag]) for (word, postag) in sentence] for sentence in pos]
+        lmtzr = nltk.stem.wordnet.WordNetLemmatizer()
+        pos = [[(word, lemmatizer(lmtzr, word, postag), [postag]) for (word, postag) in sentence] for sentence in pos]
         return pos
 		
 class DictionaryTagger(object):
