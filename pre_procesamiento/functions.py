@@ -60,10 +60,11 @@ def to_file(text, filename):
 	file.close()
 	
 def to_arff(filename):
-	text = ''
+	text = '0, '
 	file = open('LARCTREN.txt', 'r')
 	arff_file = open(filename, 'w')
 	data = file.readlines()
+	i = 0
 	for line in data:
 		word_tuple_list = line.split(')')
 		for tuple in word_tuple_list:
@@ -79,7 +80,10 @@ def to_arff(filename):
 					lemma = ''
 				if "'.'" not in lemma:
 					text = text + lemma + ' '
-		text = text + '\n'	
+		i = i+1		
+		text = text + '\n' + str(i) + ', '
+	text = text.replace("u'", "") 	
+	text = text.replace("'", "") 	
 	arff_file.write(text)
 	print "creado archivo ", filename
 	file.close()
@@ -87,6 +91,8 @@ def to_arff(filename):
 	
 def nltk_call(big_text):
 	'''
+	Funcion que toma las fuentes de conocimiento en forma de texto, y luego con nltk hace preprocesamiento para llevarlo a tripletas
+	
 	#Vamos a hacer varias pruebas
 	print "algo ", sent_tokenize(big_text)
 	print "algo ", sent_tokenize("Hello Mr. Anderson. How you doing?")
@@ -124,8 +130,8 @@ def nltk_call(big_text):
 
 	dicttagger = DictionaryTagger([ settings.YML_ROOT+'cleaner.yml'])
 	dict_tagged_sentences = dicttagger.tag(pos_tagged_sentences)	
-	to_file('\n'.join(map(str, dict_tagged_sentences)), "LARCTREN.txt")
-	to_arff("LARCTREN.arff")
+	to_file('\n'.join(map(str, dict_tagged_sentences)), "data.txt")
+	to_arff("data.csv")
 	#print dict_tagged_sentences
 	return True
 

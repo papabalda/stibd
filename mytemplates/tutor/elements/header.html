@@ -15,11 +15,13 @@
             </div><!--//to-bar-->
             <div class="header-main container">
                 <h1 class="logo col-md-4 col-sm-4">
-                    <a href="index.html"><img id="logo" style="height:125" src="{{ STATIC_URL }}design/img/onlinelogomaker-stibd.png" alt="Logo"></a>
+                    <a {% if user.is_authenticated %}href="/tutor/"{% else %}href="/"{% endif %}>
+						<img id="logo" style="height:125" src="{{ STATIC_URL }}design/img/onlinelogomaker-stibd.png" alt="Logo">
+					</a>
                 </h1><!--//logo-->           
                 <div class="info col-md-8 col-sm-8">
                     <ul class="menu-top navbar-right hidden-xs">
-                        <li class="divider"><a href="index.html">Inicio</a></li>
+                        <li class="divider"><a {% if user.is_authenticated %}href="/tutor/"{% else %}href="/"{% endif %}>Inicio</a></li>
                         <li class="divider"><a href="faq.html">FAQ</a></li>
 						{% if user.is_authenticated %}
                         <li class="divider"><a href="contact.html">Contacto</a></li>

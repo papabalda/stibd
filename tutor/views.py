@@ -1,6 +1,7 @@
 ﻿# Create your views here.
 
 import requests
+import json
 from tutor.models import *
 from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.http import Http404, HttpResponseRedirect, HttpResponse
@@ -21,14 +22,14 @@ from pre_procesamiento.functions import *
 from SPARQLWrapper import SPARQLWrapper, JSON
 import quepy
 
-sparql = SPARQLWrapper("http://localhost:3030/ds/query")
-quepy_stibd = quepy.install("quepy_stibd")
+#SPARQL = SPARQLWrapper("http://localhost:3030/ds/query")
+#QUEPY_STIBD = quepy.install("quepy_stibd")
  
 def sparql_call(query, target):
 	#http://localhost:3030/ds/query   http://dbpedia.org/sparql ab: <http://learningsparql.com/ns/addressbook#>
 	#Ya deberia estar abierto so
-	if sparql is None:
-		sparql = SPARQLWrapper("http://localhost:3030/ds/query")
+	#if sparql is None:
+	sparql = SPARQLWrapper("http://localhost:3030/ds/query")
 	
 	sparql.setQuery(query)
 	sparql.setReturnFormat(JSON)
@@ -43,7 +44,7 @@ def sparql_call(query, target):
 			print "no pude leer esto", e.message
 
 
-	#return first, results
+	return first, results
 		
 # # # TODO Funcion para interpretar las preguntas realizadas y llevarlas a tripletas a cnsultar. Luego usar sparql call y 
 # #        finalmente devolver la respuesta
@@ -99,20 +100,28 @@ def my_ajax(request):
 def question_ajax(request):
 	if request.is_ajax():
 		question = request.POST.get('question', None)
+		print str(question)
 		try:
 			# Variable global para mantener la conexion a quepy.. Tal vez no sea necesario
-			if quepy_stibd is None:
-				quepy_stibd = quepy.install("quepy_stibd")	
-			target, query, metadata = quepy_stibd.get_query(question)
+			#if QUEPY_STIBD is None:
+			QUEPY_STIBD = quepy.install("quepy_stibd")	
+			if question is not None:
+				target, query, metadata = QUEPY_STIBD.get_query(question)
+			else:
+				return HttpResponse(json.JSONEncoder().encode({"error":"No se obtuvo la pregunta"}), mimetype="application/json")
 			# run query
+			print query
 			try:
-				first, results = sparql_call(target,query)
+				first, results = sparql_call(query,target)
+				return HttpResponse(json.JSONEncoder().encode({"exito":1,"respuesta":first}), mimetype="application/json")
 			except Exception as e:
 				print e.message
 				raise Http404
 		except:
+			print " quepy install fails"
 			raise Http404
 	else:
+		print " ajax request fails"
 		raise Http404
 		
 def question(question):
@@ -124,7 +133,8 @@ def question(question):
 		print query
 		# run query
 		try:
-			sparql_call(query,target)
+			a,b = sparql_call(query,target)
+			#sparql_call(query,target)
 			
 		except Exception as e:
 			print e.message
@@ -168,15 +178,16 @@ def sparql_call2():
 			print "ok ",e.message			
 			
 def home(request):
-	#fundamentos_er_ere convert_pdf_to_txt
-	#pdf = pdf_to_text(settings.STATIC_ROOT+"/books/example.pdf")
-	#pdf = getPDFText(settings.STATIC_ROOT+"/books/example.pdf")
-	#print "ok ", pdf
+
+	#---
 	#DEscomentar pdf2 luego Entity relationship Concepts.pdf
-	pdf2 = pdf_to_text(settings.STATIC_ROOT+"/books/Entity relationship Concepts.pdf")
+	#pdf2 = pdf_to_text(settings.STATIC_ROOT+"/books/Entity relationship Concepts.pdf")
 	#print "ok2 ", pdf2
 	
-	nltk = nltk_call(pdf2) #A rare black squirrel has become a regular visitor to a suburban garden  --- We saw a little strange dog
+	# Esta funcion es para preprocesamiento, deberia correrse desde antes de hacer el runserver
+	#nltk = nltk_call(pdf2) #A rare black squirrel has become a regular visitor to a suburban garden  --- We saw a little strange dog
+	#---
+	
 	
 	# Comentando por ahora
 	#nltk = nltk_call("A rare squirrel has become a regular visitor to a suburban garden.")
@@ -184,7 +195,7 @@ def home(request):
 	#ok = question_process("What is a subclass?")
 	#ok = question("What is a subclass?")
 	# Para hacer pruebas usar index.html, del resto usar index1.html
-	return render_to_response('tutor/index.html', RequestContext(request))
+	return render_to_response('tutor/index1.html', RequestContext(request))
 	
 def login_call(request):
 	message = '¡Usuario ya se encuentra conectado!'

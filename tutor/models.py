@@ -183,3 +183,6 @@ class AseguradoForm(forms.Form):
 	colectivo = forms.IntegerField(initial=-1,widget=forms.HiddenInput(attrs={}))
 	usuario = forms.IntegerField(widget=forms.HiddenInput(attrs={}))
 	
+class TutorForm(forms.Form):
+	pregunta = forms.CharField(widget=forms.TextInput(attrs={'class':'med inputbox04'}), max_length=150, label='Pregunta:')
+	respuesta = forms.CharField(widget=forms.HiddenInput(), max_length=150)
