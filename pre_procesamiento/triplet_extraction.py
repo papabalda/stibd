@@ -62,6 +62,7 @@ def TRIPLET_EXTRACTION(text_sentence):
 		# Obtenemos el chunk tree 
 		result = cp.parse(sentence)
 		
+		#EXTRACT_SUBJECT
 		np_subtrees = breadth_first(result,search_np)
 		for subtree in np_subtrees:
 			if subtree.label()=='NP':
@@ -77,9 +78,28 @@ def TRIPLET_EXTRACTION(text_sentence):
 						word,tag = a
 						if 'VB' in tag:
 							predicate = word
-						
+
+		#EXTRACT_OBJECT
+		found = False
+		for tree in result:
+			if type(tree) is nltk.Tree:
+				if tree.label()=='VP':
+					for subtree in tree.subtrees(filter=lambda x: x.label() == 'NP' or x.label() == 'PP'):
+						for leave in subtree:
+							if type(leave) is tuple:
+								word,tag = leave
+								if 'NN' in tag:
+									object = word
+									found = True
+									break
+						if found:
+							break
+						print "\n subtree del vp ", subtree
+			if found:
+				break
+		
 		# Obtenemos NP_subtree, VP_subtree y VP_siblings
-		result = (subject, predicate, '')#EXTRACT_OBJECT(VP_siblings)
+		result = (subject, predicate, object)#EXTRACT_OBJECT(VP_siblings)
 	except:
 		print "error"
 		return None
@@ -158,7 +178,7 @@ def EXTRACT_OBJECT(VP_sbtree):
 	
 def main():
 	print "triplet extraction"
-	sentence = pos_tag(word_tokenize("Entity relationship model is the conceptual view of database."))
+	sentence = pos_tag(word_tokenize("An interesting squirrel has become a regular visitor to a small garden."))
 	#sentence = [("Mary", "NN"), ("saw", "VBD"), ("the", "DT"), ("cat", "NN"), ("sit", "VB"), ("on", "IN"), ("the", "DT"), ("mat", "NN")]
 	grammar = """
 	NP: {<DT>?<JJ>*<NN>+<PP>?} 
@@ -171,8 +191,27 @@ def main():
 	# Chunk sequences of DT, JJ, NN # Chunk prepositions followed by NP # Chunk verbs and their arguments
 	cp = nltk.RegexpParser(grammar, loop=3)
 	result = cp.parse(sentence)
-	result.draw()
+	#result.draw()
 	#print "funcion ", aux, type(result) is nltk.Tree
+	found = False
+	for tree in result:
+		if type(tree) is nltk.Tree:
+			if tree.label()=='VP':
+				for subtree in tree.subtrees(filter=lambda x: x.label() == 'NP' or x.label() == 'PP'):
+					for leave in subtree:
+						if type(leave) is tuple:
+							word,tag = leave
+							if 'NN' in tag:
+								object = word
+								found = True
+								break
+					if found:
+						break
+					print "\n subtree del vp ", subtree
+		if found:
+			break					
+	print "DONE ", object				
+	'''
 	trees = breadth_first(result,search)
 	for subtree in trees:
 		if subtree.label()=='VP':
@@ -187,7 +226,7 @@ def main():
 						sentence = word
 		
 	print "DONE ", sentence
-	'''
+	
 	queue = deque([(result, 0)])
 	print "\n queue, ",queue
 	node, depth = queue.popleft()
@@ -200,7 +239,7 @@ def main():
 	
 	print queue[0], "\n", queue[1]
 	'''
-#print TRIPLET_EXTRACTION("Entity relationship model is the conceptual view of database.")	
-#print TRIPLET_EXTRACTION("An interesting squirrel has become a regular visitor to a small garden.")	
+print TRIPLET_EXTRACTION("Entity relationship model is the conceptual view of database.")	
+print TRIPLET_EXTRACTION("An interesting squirrel has become a regular visitor to a small garden.")	
 #print TRIPLET_EXTRACTION("It works around real world entity and association among them")
-main()	
+#main()	
