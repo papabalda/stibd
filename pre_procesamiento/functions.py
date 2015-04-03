@@ -10,6 +10,7 @@ from nltk.tokenize import sent_tokenize, word_tokenize, wordpunct_tokenize
 from nltk.tag import pos_tag
 from nltk.chunk import ne_chunk
 from preprocessing import *
+from triplet_extraction import *
 #PDF
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.converter import TextConverter
@@ -105,25 +106,30 @@ def nltk_call(big_text):
 	words = word_tokenize("And now for something completely different")
 	print "pos tag ", pos_tag(words)
 	#Chunking NP!'''
+
 	
-	#sentence = pos_tag(word_tokenize("Mary saw the cat sit on the mat."))
-	sentence = [("Mary", "NN"), ("saw", "VBD"), ("the", "DT"), ("cat", "NN"), ("sit", "VB"), ("on", "IN"), ("the", "DT"), ("mat", "NN")]
-	#grammar = "NP: {<DT>?<JJ>*<NN>} VP: {<VB.*><NP>+$} " # expresion regular dt opcional, seguido de cualquier cantidad de jj y nn
-	grammar = r"""NP: {<DT|JJ|NN.*>+} 
-	PP: {<IN><NP>} 
-	VP: {<VB.*><NP|PP|CLAUSE>+\$} 
-	CLAUSE: {<NP><VP>} """   
-	# Chunk sequences of DT, JJ, NN # Chunk prepositions followed by NP # Chunk verbs and their arguments
-	cp = nltk.RegexpParser(grammar, loop=2)
-	result = cp.parse(sentence)
-	#result.draw()
-	print "algo ", result
 	#print "algo postag", pos_tag(word_tokenize(big_text))
-	text = "The increase will cover all kinds of wheat including durum and milling wheat."
+	#text = "The increase will cover all kinds of wheat including durum and milling wheat."
+	text = "Entity relationship model defines the conceptual view of database."
 	#text = """What can I say about this place. The staff of the restaurant is nice and the eggplant is not bad. Apart from that, very uninspired food, lack of atmosphere and too expensive. I am a staunch vegetarian and was sorely dissapointed with the veggie options on the menu. Will be the last time I visit, I recommend others to avoid."""
 	splitter = Splitter()
 	postagger = POSTagger()
-	splitted_sentences = splitter.split(big_text)
+	splitted_sentences = splitter.split(text)
+	#print "\n", splitted_sentences
+	pos_tagged_sentences = postagger.pos_tag(splitted_sentences)
+	#print "\n", pos_tagged_sentences cleaner positive
+
+	#dicttagger = DictionaryTagger([ settings.YML_ROOT+'cleaner.yml'])
+	#dict_tagged_sentences = dicttagger.tag(pos_tagged_sentences)	
+	for sentence in pos_tagged_sentences:
+		print TRIPLET_EXTRACTION(sentence)
+	#print dict_tagged_sentences
+	return True
+
+def clasification(text):
+	splitter = Splitter()
+	postagger = POSTagger()
+	splitted_sentences = splitter.split(text)
 	#print "\n", splitted_sentences
 	pos_tagged_sentences = postagger.pos_tag(splitted_sentences)
 	#print "\n", pos_tagged_sentences cleaner positive
@@ -134,8 +140,7 @@ def nltk_call(big_text):
 	to_arff("data.csv")
 	#print dict_tagged_sentences
 	return True
-
-
+	
 def getPDFText(pdfFilenamePath):
 	retstr = StringIO()
 	parser = PDFParser(open(pdfFilenamePath,'rb'))

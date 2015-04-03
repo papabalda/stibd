@@ -44,13 +44,78 @@ def breadth_first(tree, children=iter, maxdepth=-1):
                 #print "aa ", e.message
                 pass
 				
-def TRIPLET_EXTRACTION(text_sentence):
+def TRIPLET_EXTRACTION_FROM_TEXT(text_sentence):
 			
 	try:
 		
 		print "triplet extraction"
 		#sentence = pos_tag(word_tokenize("An interesting squirrel has become a regular visitor to a small garden."))
 		sentence = pos_tag(word_tokenize(text_sentence))
+		#print sentence
+		grammar = """
+		NP: {<DT>?<JJ>*<NN><PP>?} 
+		PP: {<IN><NP>|<TO><NP>}
+		VP: {<VB.*|VP><NP><PP>|<VB.*><VP>+} 
+		""" # expresion regular dt opcional, seguido de cualquier cantidad de jj y nn  <VB.*|VP><NP|PP>+
+		
+		# Chunk sequences of DT, JJ, NN # Chunk prepositions followed by NP # Chunk verbs and their arguments
+		cp = nltk.RegexpParser(grammar, loop=3)
+		# Obtenemos el chunk tree 
+		result = cp.parse(sentence)
+		
+		#EXTRACT_SUBJECT
+		np_subtrees = breadth_first(result,search_np)
+		for subtree in np_subtrees:
+			if subtree.label()=='NP':
+				subject, attributes = EXTRACT_SUBJECT(subtree)
+				break
+				
+		#EXTRACT_PREDICATE		
+		vp_subtrees = breadth_first(result,search)
+		for subtree in vp_subtrees:
+			if subtree.label()=='VP':
+				for a in subtree:
+					if type(a) is tuple:
+						word,tag = a
+						if 'VB' in tag:
+							predicate = word
+
+		#EXTRACT_OBJECT
+		found = False
+		for tree in result:
+			if type(tree) is nltk.Tree:
+				if tree.label()=='VP':
+					for subtree in tree.subtrees(filter=lambda x: x.label() == 'NP' or x.label() == 'PP'):
+						for leave in subtree:
+							if type(leave) is tuple:
+								word,tag = leave
+								if 'NN' in tag:
+									object = word
+									found = True
+									break
+						if found:
+							break
+						print "\n subtree del vp ", subtree
+			if found:
+				break
+		
+		# Obtenemos NP_subtree, VP_subtree y VP_siblings
+		result = (subject, predicate, object)#EXTRACT_OBJECT(VP_siblings)
+	except:
+		print "error"
+		return None
+	return result
+
+# Funcion para extraer tripletas usando ya el procesamiento con lematizacion y diccionarios en lugar del basico nltk	
+def TRIPLET_EXTRACTION(sentence_of_tuples):
+			
+	try:
+		sentence = []
+		for (word,lemma,tag_array) in sentence_of_tuples:
+			sentence.append((lemma,tag_array[0]))
+			
+		print "triplet extraction"
+		print sentence, "\n"
 		grammar = """
 		NP: {<DT>?<JJ>*<NN><PP>?} 
 		PP: {<IN><NP>|<TO><NP>}
@@ -239,7 +304,13 @@ def main():
 	
 	print queue[0], "\n", queue[1]
 	'''
-print TRIPLET_EXTRACTION("Entity relationship model is the conceptual view of database.")	
-print TRIPLET_EXTRACTION("An interesting squirrel has become a regular visitor to a small garden.")	
+#print TRIPLET_EXTRACTION_FROM_TEXT("Entity relationship model is the conceptual view of database.")	
+#print TRIPLET_EXTRACTION_FROM_TEXT("An interesting squirrel has become a regular visitor to a small garden.")	
 #print TRIPLET_EXTRACTION("It works around real world entity and association among them")
 #main()	
+'''
+from nltk.corpus import wordnet
+for word,tag in wordnet.tagged_words():
+	if 'defines' in word:
+		print word,tag
+'''		

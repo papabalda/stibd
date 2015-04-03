@@ -75,6 +75,8 @@ STATIC_URL = '/static/'
 # URL para diccionarios yml a utilizar
 YML_ROOT = 'C:/Users/Carlo/Desktop/stibd/pre_procesamiento/dicts/'
 
+BOOKS_URL = 'C:/Users/Carlo/Desktop/stibd/static'
+
 # Additional locations of static files
 STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".

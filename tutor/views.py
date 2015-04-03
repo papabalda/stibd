@@ -18,13 +18,30 @@ from nltk.tag import pos_tag
 from nltk.chunk import ne_chunk
 #Preprocesamiento
 from pre_procesamiento.functions import *
+from pre_procesamiento.tfidf import *
 #from pre_procesamiento.preprocessing import *
 from SPARQLWrapper import SPARQLWrapper, JSON
 import quepy
-
+#normalizacion
+from num2words import num2words
 #SPARQL = SPARQLWrapper("http://localhost:3030/ds/query")
 #QUEPY_STIBD = quepy.install("quepy_stibd")
- 
+
+def normalization(text):
+	# lower case
+	output = text.lower()
+	# expanding abbreviations AND #text canonicalization it's = it is
+	abbrevs={'\'s':' is', 'defines':'is','eer':' enhanced entity relationship', '1:1':'one-to-one','1:n':'one-to-many','n:1':'many-to-one','m:n':'many-to-many',' er ':' entity relationship extended ', }#esto deberia salir de un file si se vuelve muy grande
+	for abbrev in abbrevs:
+		output = output.replace(abbrev,abbrevs[abbrev])
+	# numbers to words
+	#para cada numero en texto ordenado de mayor a menor, reemplazarlo por su word
+	gen = (int(s) for s in output.split() if s.isdigit())
+	for number in gen:
+		output = output.replace(str(number),num2words(number))
+	
+	return output
+	
 def sparql_call(query, target):
 	#http://localhost:3030/ds/query   http://dbpedia.org/sparql ab: <http://learningsparql.com/ns/addressbook#>
 	#Ya deberia estar abierto so
@@ -181,13 +198,15 @@ def home(request):
 
 	#---
 	#DEscomentar pdf2 luego Entity relationship Concepts.pdf
-	#pdf2 = pdf_to_text(settings.STATIC_ROOT+"/books/Entity relationship Concepts.pdf")
+	#pdf2 = pdf_to_text(settings.BOOKS_URL+"/books/Entity relationship Concepts.pdf")
 	#print "ok2 ", pdf2
 	
 	# Esta funcion es para preprocesamiento, deberia correrse desde antes de hacer el runserver
-	#nltk = nltk_call(pdf2) #A rare black squirrel has become a regular visitor to a suburban garden  --- We saw a little strange dog
+	#nltk = clasification(pdf2) #A rare black squirrel has become a regular visitor to a suburban garden  --- We saw a little strange dog
 	#---
-	
+	#text = normalization(pdf2)
+	# Funcion para obtener los valores tfidf por palabra en el/los documento(s)
+	#tfidf_table([text],True) #, create_csv = ,True
 	
 	# Comentando por ahora
 	#nltk = nltk_call("A rare squirrel has become a regular visitor to a suburban garden.")

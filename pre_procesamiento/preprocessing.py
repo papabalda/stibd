@@ -38,6 +38,7 @@ class Splitter(object):
  
 class POSTagger(object):
     def __init__(self):
+        #self.nltk_splitter = nltk.data.load('taggers/hmm_treebank_pos_tagger/treebank.tagger.pickle.gz')
         pass
         
     def pos_tag(self, sentences):
