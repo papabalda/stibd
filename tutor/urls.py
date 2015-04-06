@@ -32,6 +32,7 @@ urlpatterns = patterns('tutor.views',
     url(r'^$', 'index'),
     url(r'^login/$', 'login_call'),
     url(r'^logout/$', 'logout_call'),
+    url(r'^run/$', 'preprocess'),
     url(r'^question/$', 'question_ajax'),
 )
 urlpatterns += patterns('',

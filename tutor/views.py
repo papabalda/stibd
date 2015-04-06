@@ -24,18 +24,23 @@ from SPARQLWrapper import SPARQLWrapper, JSON
 import quepy
 #normalizacion
 from num2words import num2words
+import timeit
 #SPARQL = SPARQLWrapper("http://localhost:3030/ds/query")
 #QUEPY_STIBD = quepy.install("quepy_stibd")
 
 def normalization(text):
 	# lower case
 	output = text.lower()
+	# Cut enumerate numbers
+	no_use_numbers = ['0.','1.','2.','3.','4.','5.','6.','7.','8.','9.','10.',' ex ']
+	for num in no_use_numbers:
+		output = output.replace(num,'.')
 	# expanding abbreviations AND #text canonicalization it's = it is
-	abbrevs={'\'s':' is', 'defines':'is','eer':' enhanced entity relationship', '1:1':'one-to-one','1:n':'one-to-many','n:1':'many-to-one','m:n':'many-to-many',' er ':' entity relationship extended ', }#esto deberia salir de un file si se vuelve muy grande
+	abbrevs={'\n':' ','\'s':' ', '...':'.','..':'.', ' b ':' ','defines':'is','eer':' enhanced entity relationship', '1:1':'one-to-one','1:n':'one-to-many','n:1':'many-to-one','m:n':'many-to-many',' er ':' entity relationship ', }#esto deberia salir de un file si se vuelve muy grande
 	for abbrev in abbrevs:
 		output = output.replace(abbrev,abbrevs[abbrev])
 	# numbers to words
-	#para cada numero en texto ordenado de mayor a menor, reemplazarlo por su word
+	#para cada numero restante en el texto, ordenado de mayor a menor, reemplazarlo por su word
 	gen = (int(s) for s in output.split() if s.isdigit())
 	for number in gen:
 		output = output.replace(str(number),num2words(number))
@@ -193,26 +198,82 @@ def sparql_call2():
 					print "no pude leer esto"
 		except Exception as e:
 			print "ok ",e.message			
-			
-def home(request):
 
+# carga el texto con las stopwords del archivo predeterminado para las mismas			
+def load_stopwords():
+	stopwords = ""
+	try:
+		print settings.YML_ROOT+'stopwords.txt'
+		f = open(settings.YML_ROOT+'stopwords.txt','rb')
+		stopwords = load(f)
+		f.close()
+	except:
+		print "Error opening/loading ", filename
+		return ''			
+	return stopwords	
+
+def preprocess(request):
+
+	start = timeit.default_timer()
 	#---
-	#DEscomentar pdf2 luego Entity relationship Concepts.pdf
-	#pdf2 = pdf_to_text(settings.BOOKS_URL+"/books/Entity relationship Concepts.pdf")
-	#print "ok2 ", pdf2
+	#DEscomentar pdf luego Entity relationship Concepts.pdf
+	books = ["db1.pdf","db2.pdf", "fundamentos_er_ere.pdf"]#"Entity relationship Concepts.pdf", "fundamentos_er_ere.pdf"
+	texts = []
 	
-	# Esta funcion es para preprocesamiento, deberia correrse desde antes de hacer el runserver
-	#nltk = clasification(pdf2) #A rare black squirrel has become a regular visitor to a suburban garden  --- We saw a little strange dog
-	#---
-	#text = normalization(pdf2)
+	for book in books:
+		pdf = pdf_to_text(settings.BOOKS_URL+book)
+		#print "ok ", pdf
+		text = normalization(pdf)
+		#print "\n\n",text
+		# Esta funcion es para preprocesamiento, deberia correrse desde antes de hacer el runserver
+		#nltk = clasification(pdf) #A rare black squirrel has become a regular visitor to a suburban garden  --- We saw a little strange dog
+		#---
+		texts.append(text)
 	# Funcion para obtener los valores tfidf por palabra en el/los documento(s)
-	#tfidf_table([text],True) #, create_csv = ,True
+	tfidf_table(texts,load_stopwords()) #, create_csv = ,True
 	
 	# Comentando por ahora
 	#nltk = nltk_call("A rare squirrel has become a regular visitor to a suburban garden.")
 	#sparql_call2()
 	#ok = question_process("What is a subclass?")
 	#ok = question("What is a subclass?")
+	
+	stop = timeit.default_timer()
+	print stop - start
+	
+	# Para hacer pruebas usar index.html, del resto usar index1.html
+	return render_to_response('tutor/index.html', RequestContext(request))
+
+	
+def home(request):
+	'''
+	start = timeit.default_timer()
+	#---
+	#DEscomentar pdf luego Entity relationship Concepts.pdf
+	books = ["db1.pdf","db2.pdf", "fundamentos_er_ere.pdf"]#"Entity relationship Concepts.pdf", "fundamentos_er_ere.pdf"
+	texts = []
+	
+	for book in books:
+		pdf = pdf_to_text(settings.BOOKS_URL+book)
+		#print "ok ", pdf
+		text = normalization(pdf)
+		#print "\n\n",text
+		# Esta funcion es para preprocesamiento, deberia correrse desde antes de hacer el runserver
+		#nltk = clasification(pdf) #A rare black squirrel has become a regular visitor to a suburban garden  --- We saw a little strange dog
+		#---
+		texts.append(text)
+	# Funcion para obtener los valores tfidf por palabra en el/los documento(s)
+	tfidf_table(texts,load_stopwords()) #, create_csv = ,True
+	
+	# Comentando por ahora
+	#nltk = nltk_call("A rare squirrel has become a regular visitor to a suburban garden.")
+	#sparql_call2()
+	#ok = question_process("What is a subclass?")
+	#ok = question("What is a subclass?")
+	
+	stop = timeit.default_timer()
+	print stop - start
+	'''
 	# Para hacer pruebas usar index.html, del resto usar index1.html
 	return render_to_response('tutor/index1.html', RequestContext(request))
 	

@@ -6,6 +6,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     url(r'^$', 'tutor.views.home'),
+    url(r'^run/', 'tutor.views.preprocess'),
     url(r'^polls/', include('tutor.urls')),
     url(r'^tutor/', include('tutor.urls')),
     # Uncomment the admin/doc line below to enable admin documentation:
