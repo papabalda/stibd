@@ -16,7 +16,7 @@ from quepy.parsing import Lemma, Pos, QuestionTemplate, Token, Particle, \
                           Lemmas
 from quepy.dsl import HasKeyword, IsRelatedTo, HasType
 from dsl import DefinitionOf, LabelOf, IsPlace, \
-    UTCof, LocationOf
+    UTCof, LocationOf, IsRepresented, Defines, Contains, HasName
 
 
 # Openings
@@ -33,7 +33,7 @@ class Thing(Particle):
 
 class WhatIs(QuestionTemplate):
     """
-    Regex for questions like "What is a blowtorch
+    Regex for questions like "What is a database
     Ex: "What is a car"
         "What is Seinfield?"
     """
@@ -46,7 +46,51 @@ class WhatIs(QuestionTemplate):
 
         return label, "define"
 
+class HowIsRepresented(QuestionTemplate):
+    """
+    Regex for questions like "How is represented a entity
+    Ex: "What is a car"
+        "What is Seinfield?"
+    """
+	#print Lemma("represented")
+    regex = Pos("WRB") + Token("is") + Token("represented") + Question(Pos("DT")) + \
+        Thing() + Question(Pos("."))
 
+    def interpret(self, match):
+        label = IsRepresented(match.thing)
+		#rep = LabelOf(label)
+        return label, "define"		
+
+class WhatDefines(QuestionTemplate):
+    """
+    Regex for questions like "What does define a entity_relationship_model?
+    Ex: "What is a car"
+        "What is Seinfield?"
+    """
+
+    regex = Lemma("what") + Token("does") + Token("define") + Question(Pos("DT")) + \
+        Thing() + Question(Pos("."))
+
+    def interpret(self, match):
+        label = Defines(match.thing)
+
+        return label, "define"	
+
+class WhatContains(QuestionTemplate):
+    """
+    Regex for questions like "What does a multivalued_attribute contains?
+    Ex: "What is a car"
+        "What is Seinfield?"
+    """
+
+    regex = Lemma("what") + Token("does") + Question(Pos("DT")) + \
+        Thing() + Token("contains") + Question(Pos("."))
+
+    def interpret(self, match):
+        label = Contains(match.thing)
+
+        return label, "define"	
+		
 class ListEntity(QuestionTemplate):
     """
     Regex for questions like "List Microsoft software"

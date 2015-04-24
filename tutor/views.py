@@ -64,9 +64,9 @@ def sparql_call(query, target):
 		except Exception as e:
 			#first = None
 			print "no pude leer esto", e.message
-
-
-	return first, results
+	print "\n"
+	return None, None
+	#return first, results
 		
 # # # TODO Funcion para interpretar las preguntas realizadas y llevarlas a tripletas a cnsultar. Luego usar sparql call y 
 # #        finalmente devolver la respuesta
@@ -119,11 +119,40 @@ def my_ajax(request):
 	else:
 		raise Http404
 
+def taxonomy_search(question):
+	if "what is a subclass" in question:
+		return "what is a class?","definition of class"
+	return None, None	
+		
+def alternative_ajax(request):
+	if request.is_ajax():
+		question = request.POST.get('question', None)
+		print str(question)
+		
+		# Funcion que determine si hay una pregunta similar
+		try:
+			pregunta, respuesta = taxonomy_search(question)
+			print "lala ", pregunta, "lolo ", respuesta 
+			if pregunta is not None:
+				return HttpResponse(json.JSONEncoder().encode({"exito":1,"alternativa":pregunta,"respuesta_alt":respuesta}), mimetype="application/json")
+			else:	
+				return HttpResponse(json.JSONEncoder().encode({"exito":1}), mimetype="application/json")
+		except Exception as e:
+			print e.message
+			raise Http404
+
+	else:
+		print " ajax request fails"
+		raise Http404
+
+
 def question_ajax(request):
 	if request.is_ajax():
 		question = request.POST.get('question', None)
 		print str(question)
 		try:
+			# Funcion que determine si hay una pregunta similar
+		
 			# Variable global para mantener la conexion a quepy.. Tal vez no sea necesario
 			#if QUEPY_STIBD is None:
 			QUEPY_STIBD = quepy.install("quepy_stibd")	
@@ -141,7 +170,8 @@ def question_ajax(request):
 				raise Http404
 		except:
 			print " quepy install fails"
-			raise Http404
+			return HttpResponse(json.JSONEncoder().encode({"error":"No se pudo procesar la pregunta"}), mimetype="application/json")
+			#raise Http404
 	else:
 		print " ajax request fails"
 		raise Http404
@@ -149,12 +179,14 @@ def question_ajax(request):
 def question(question):
 	try:
 		# Variable global para mantener la conexion a quepy.. Tal vez no sea necesario
+		quepy_stibd = None
 		if quepy_stibd is None:
 			quepy_stibd = quepy.install("quepy_stibd")	
 		target, query, metadata = quepy_stibd.get_query(question)
 		print query
 		# run query
 		try:
+			#pass
 			a,b = sparql_call(query,target)
 			#sparql_call(query,target)
 			
@@ -223,20 +255,23 @@ def preprocess(request):
 	for book in books:
 		pdf = pdf_to_text(settings.BOOKS_URL+book)
 		#print "ok ", pdf
-		text = normalization(pdf)
+		#text = normalization(pdf)
 		#print "\n\n",text
 		# Esta funcion es para preprocesamiento, deberia correrse desde antes de hacer el runserver
 		#nltk = clasification(pdf) #A rare black squirrel has become a regular visitor to a suburban garden  --- We saw a little strange dog
 		#---
-		texts.append(text)
+		#texts.append(text)
 	# Funcion para obtener los valores tfidf por palabra en el/los documento(s)
-	tfidf_table(texts,load_stopwords()) #, create_csv = ,True
+	#tfidf_table(texts,load_stopwords()) #, create_csv = ,True
 	
 	# Comentando por ahora
 	#nltk = nltk_call("A rare squirrel has become a regular visitor to a suburban garden.")
 	#sparql_call2()
 	#ok = question_process("What is a subclass?")
-	#ok = question("What is a subclass?")
+	ok = question("What is a database?")
+	ok1 = question("How is represented a entity?")
+	#ok2 = question("What does define a entity_relationship_model?")
+	ok3 = question("What does a entity contains?")
 	
 	stop = timeit.default_timer()
 	print stop - start
@@ -244,6 +279,19 @@ def preprocess(request):
 	# Para hacer pruebas usar index.html, del resto usar index1.html
 	return render_to_response('tutor/index.html', RequestContext(request))
 
+def contact(request):
+	# if autenticado index2
+	return render_to_response('tutor/index1.html', {'vista': 'contact'}, RequestContext(request))	
+	
+def faq(request):
+
+	# if autenticado index2
+	return render_to_response('tutor/index1.html', {'vista': 'faq'}, RequestContext(request))	
+
+def register(request):
+
+	# if autenticado index2
+	return render_to_response('tutor/index1.html', {'vista': 'register'}, RequestContext(request))	
 	
 def home(request):
 	'''
@@ -316,8 +364,13 @@ def logout_call(request):
 	#return render_to_response('audit/index.html', {'message': message})
 	return redirect('/',request, message)
 	
-
+@login_required(login_url='/')
 def index(request):
+	'''
+	user = request.user
+	profile = user.get_profile()
+	groups = set(user.groups.values_list('name',flat=True))
+	'''
 	return render_to_response('tutor/index2.html', RequestContext(request))
 
 '''	

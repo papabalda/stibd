@@ -2,7 +2,7 @@ from __future__ import division, unicode_literals
 import math
 from textblob import TextBlob as tb
 from pre_procesamiento.functions import to_file
-from progress.bar import Bar
+#from progress.bar import Bar
 from collections import defaultdict
 import itertools
 import timeit

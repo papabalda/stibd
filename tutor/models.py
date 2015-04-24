@@ -110,6 +110,7 @@ class Respuesta(models.Model):
 	respuesta_id = models.IntegerField(primary_key=True)
 	pregunta = models.ForeignKey(Pregunta, db_column='pregunta')
 	descripcion = models.CharField(max_length=1000)	# Descripcion en lenguaje natural de la Respuesta
+	rating = models.IntegerField(default=3)
 	#composicion = models.ForeignKey(Tripleta, db_column='composicion') # Descripcion estructura en triple(sparql) de la respuesta
 	class Meta:
 		db_table = u'respuesta'

@@ -1,29 +1,35 @@
 <section class="news">
-	<h1 class="section-heading text-highlight"><span class="line">Bienvenido a tu Sistema Tutorial Inteligente</span></h1>     
+	<h1 class="section-heading text-highlight"><span class="line">Welcome to your Intelligent Tutoring System</span></h1>    
+	<!--
 	<div class="carousel-controls">
 		<a class="prev" href="#news-carousel" data-slide="prev"><i class="fa fa-caret-left"></i></a>
 		<a class="next" href="#news-carousel" data-slide="next"><i class="fa fa-caret-right"></i></a>
-	</div><!--//carousel-controls--> 
-	<div class="section-content clearfix">
+	</div>//carousel-controls--> 
+	<div id = "tutor-content" class="section-content clearfix">
 		<div id="news-carousel" class="news-carousel carousel slide">
 			<div class="">
 				<div class=""> 
 					<div class="col-md-4 news-item" style="width:50%;padding-left:35">
-						<h2 class="title">Usar el tutor es muy sencillo </h2>
-						<p>Introduce tu pregunta y pulsa el boton para continuar, da un ranking a la respuesta y sigue a tu próxima pregunta</p>
+						<h2 class="title">Using the tutor is very simple </h2>
+						<p>Enter your question and click the button to continue , give a ranking to the response and follow to your next question</p>
 						<form class="subscribe-form" action="#"> {% csrf_token %}
                             <div class="form-group">
-                                <input type="text" id="Pregunta" class="form-control" placeholder="Introduzca su pregunta">
-								<input class="btn btn-theme btn-subscribe" id="Preguntar" type="submit" value="Preguntar">
+                                <input type="text" id="Pregunta" class="form-control" placeholder="Enter your question here"/>
+								<!--<div id = "Alterna" style=" clear:both; text-align:center; font-size:larger; font-weight:bold; color:#F90"> KK</div>-->
+								<input class="btn btn-theme btn-subscribe" id="Preguntar" type="submit" value="Answer me"/>
+								<!-- f0f4 f16c f0a6 f091-->
+ 								<input id="input-22" class="rating" data-step="1" data-size="md" data-symbol="&#xf0f4;" data-glyphicon="false" 
+    data-rating-class="rating-fa" >
                             </div>
                         </form>                
 					</div><!--//news-item-->
-					<div class="col-md-4 news-item" id="Respuesta" style="width:45%;height:33%;background-color:white;padding-left:35;padding-top:35;border:double">
-						<h2 class="title" align="left">Área de Respuestas </h2>
-						<p>Una vez que realices tus preguntas podras ver aqui tus respuestas.</p>
+					<div class="col-md-4 news-item" id="Respuesta" style="margin-left:20; width:45%;height:33%;background-color:white;padding-left:35;padding-top:35;border:double">
+						<h2 class="title" align="left">Answer Area </h2>
+						<p>Once you make your questions, you can see your answers here.</p>
 					</div><!--//news-item-->
 				</div><!--//item-->
+				<div id="question" style="display:none; cursor: default"> <h1 class="section-heading text-highlight" style = "font-family:'open sans', arial, sans-serif"><span class="line">Did you mean? "What is a class?"</span></h1> <input class="btn btn-theme btn-subscribe" type="button" id="yes" value="Yes" /> <input class="btn btn-theme btn-subscribe" type="button" id="no" value="No" /></div>
 			</div><!--//carousel-inner-->
 		</div><!--//news-carousel-->  
-	</div><!--//section-content-->     
+	</div><!--//section-content-->    
 </section><!--//news-->

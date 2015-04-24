@@ -33,7 +33,11 @@ urlpatterns = patterns('tutor.views',
     url(r'^login/$', 'login_call'),
     url(r'^logout/$', 'logout_call'),
     url(r'^run/$', 'preprocess'),
+    url(r'^contact/', 'tutor.views.contact'),
+    url(r'^faq/', 'tutor.views.faq'),
+    url(r'^register/', 'tutor.views.register'),
     url(r'^question/$', 'question_ajax'),
+    url(r'^alternative/$', 'alternative_ajax'),
 )
 urlpatterns += patterns('',
     # Uncomment the admin/doc line below to enable admin documentation:

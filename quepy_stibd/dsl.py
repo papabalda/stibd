@@ -12,12 +12,32 @@ Domain specific language for DBpedia quepy.
 """
 
 from quepy.dsl import FixedType, HasKeyword, FixedRelation, FixedDataRelation
+#dsl para STIBD
 
 # Setup the Keywords for this application
-HasKeyword.relation = "rdfs:label"
+#HasKeyword.relation = "rdfs:label"
+HasKeyword.relation = "stibd:concept_name"
 #HasKeyword.language = "en"
 
-
+class DefinitionOf(FixedRelation):
+    relation = "rdfs:comment"
+    reverse = True
+	
+class IsRepresented(FixedRelation):
+    relation = "stibd:is_represented"
+    reverse = True
+	
+class Defines(FixedRelation):
+    relation = "stibd:define"
+    reverse = True
+	
+class Contains(FixedRelation):
+    relation = "stibd:contain"
+    reverse = True
+	
+class HasName(FixedDataRelation):
+    relation = "stibd:concept_name"
+	
 class IsPerson(FixedType):
     fixedtype = "foaf:Person"
 
@@ -26,6 +46,10 @@ class IsPlace(FixedType):
     fixedtype = "dbpedia:Place"
 
 
+class LabelOf(FixedRelation):
+    relation = "rdfs:label"
+    reverse = True
+	
 class IsCountry(FixedType):
     fixedtype = "dbpedia-owl:Country"
 
@@ -56,14 +80,6 @@ class HasName(FixedDataRelation):
     language = "en"
 
 
-class DefinitionOf(FixedRelation):
-    relation = "rdfs:comment"
-    reverse = True
-
-
-class LabelOf(FixedRelation):
-    relation = "rdfs:label"
-    reverse = True
 
 
 class UTCof(FixedRelation):

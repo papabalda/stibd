@@ -21,17 +21,18 @@
                 </h1><!--//logo-->           
                 <div class="info col-md-8 col-sm-8">
                     <ul class="menu-top navbar-right hidden-xs">
-                        <li class="divider"><a {% if user.is_authenticated %}href="/tutor/"{% else %}href="/"{% endif %}>Inicio</a></li>
-                        <li class="divider"><a href="faq.html">FAQ</a></li>
+                        <li class="divider"><a {% if user.is_authenticated %}href="/tutor/"{% else %}href="/"{% endif %}>Home</a></li>
+                        <li class="divider"><a href="/faq">FAQ</a></li>
 						{% if user.is_authenticated %}
-                        <li class="divider"><a href="contact.html">Contacto</a></li>
-						<li><a href="/tutor/logout/">Cerrar Sesión</a></li>
+                        <li class="divider"><a href="/contact">Contact</a></li>
+						<li><a href="/tutor/logout/">Log Out</a></li>
 						{% else %}
-                        <li><a href="contact.html">Contacto</a></li>
+                        <li class="divider"><a href="/contact">Contact</a></li>
+                        <li><a href="/register">Register</a></li>
 						{% endif %}
                     </ul><!--//menu-top-->
                     <br>
-					<div><h1>Sistema Tutorial Inteligente para Base de Datos</h1></div>
+					<div><h1> Intelligent Tutoring System for DataBases</h1></div>
                 </div><!--//info-->
             </div><!--//header-main-->
         </header><!--//header-->

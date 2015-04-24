@@ -9,9 +9,9 @@
 {% if not user.is_authenticated %}
   <form action="/tutor/login/" align="right" method="post">
       {% csrf_token %}
-      <input type="text" name="login" placeholder="Nombre de Usuario" style="height:33px; padding:6px 12px" id="login"/>
-      <input type="password" name="password" placeholder="Contraseña" style="height:33px; padding:6px 12px" id="password"/>
-  <button type="submit" class="btn btn-theme">Entrar</button>
+      <input type="text" name="login" placeholder="Username" style="height:33px; padding:6px 12px" id="login"/>
+      <input type="password" name="password" placeholder="Password" style="height:33px; padding:6px 12px" id="password"/>
+  <button type="submit" class="btn btn-theme">Log In</button>
   </form>
 {% else %}
     {% csrf_token %}

@@ -1,5 +1,5 @@
-﻿<html lang="en"><!--<![endif]--><head>
-    <title>STIBD - Sistema Tutorial Inteligente para Base de Datos</title>
+﻿<html lang="en"><head>
+    <title>STIBD - Intelligent Tutoring System for DataBases</title>
     <!-- Meta -->
     <!--<meta http-equiv="X-UA-Compatible" content="IE=edge">-->
 	{% include "elements/meta_tags.html" %}
@@ -15,6 +15,20 @@
     <link id="theme-style" rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/styles-purple.css">
 	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
 	<!--<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/font-awesome.min.css">-->
+	<link rel="stylesheet" type="text/css" media="all" href="{{ STATIC_URL }}css/star-rating.min.css" />
+	
+	<!--
+	<script>
+		(function($){
+			var $span = $('<span class="fa" style="display:none"></span>').appendTo('body');
+			if ($span.css('fontFamily') !== 'FontAwesome' ) {
+				// Fallback Link
+				$('head').append('<link href="{{ STATIC_URL }}css/font-awesome.min.css" rel="stylesheet">');
+			}
+			$span.remove();
+		})(jQuery);
+	</script>
+	-->
 </head> 
 
 <body class="home-page">
@@ -23,8 +37,21 @@
         {% include "tutor/elements/navigate.html" %}
         <!-- ******CONTENT****** --> 
         <div class="content container">
-            {% include "tutor/elements/join.html" %}
-            {% include "tutor/elements/content.html" %}
+		
+		{% ifequal "contact" vista %}
+            {% include "tutor/elements/contact.html" %}
+		{% else %}
+			{% ifequal "register" vista %}
+				{% include "tutor/elements/register.html" %}
+			{% else %}
+				{% ifequal "faq" vista %}
+					{% include "tutor/elements/faq.html" %}
+				{% else %}
+					{% include "tutor/elements/join.html" %}
+					{% include "tutor/elements/content.html" %}
+				{% endifequal %}
+			{% endifequal %}
+		{% endifequal %}
         </div><!--//content-->
     </div><!--//wrapper-->
     {% include "tutor/elements/footer.html" %}
