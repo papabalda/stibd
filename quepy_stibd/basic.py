@@ -33,9 +33,8 @@ class Thing(Particle):
 
 class WhatIs(QuestionTemplate):
     """
-    Regex for questions like "What is a database
-    Ex: "What is a car"
-        "What is Seinfield?"
+    Regex for questions like "What is a database?
+    Ex: "What is a entity"
     """
 
     regex = Lemma("what") + Lemma("be") + Question(Pos("DT")) + \
@@ -48,9 +47,8 @@ class WhatIs(QuestionTemplate):
 
 class HowIsRepresented(QuestionTemplate):
     """
-    Regex for questions like "How is represented a entity
-    Ex: "What is a car"
-        "What is Seinfield?"
+    Regex for questions like "How is represented an entity?
+    Ex: "How is represented an entity"
     """
 	#print Lemma("represented")
     regex = Pos("WRB") + Token("is") + Token("represented") + Question(Pos("DT")) + \
@@ -64,7 +62,7 @@ class HowIsRepresented(QuestionTemplate):
 class WhatDefines(QuestionTemplate):
     """
     Regex for questions like "What does define a entity_relationship_model?
-    Ex: "What is a car"
+    Ex: "What does define a entity_relationship_model?"
         "What is Seinfield?"
     """
 

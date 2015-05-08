@@ -49,9 +49,9 @@ def normalization(text):
 	
 def sparql_call(query, target):
 	#http://localhost:3030/ds/query   http://dbpedia.org/sparql ab: <http://learningsparql.com/ns/addressbook#>
-	#Ya deberia estar abierto so
+	#Ya deberia estar abierto so http://esmar.ldc.usb.ve:3030/ds/query
 	#if sparql is None:
-	sparql = SPARQLWrapper("http://localhost:3030/ds/query")
+	sparql = SPARQLWrapper("http://esmar.ldc.usb.ve:3030/ds/query")
 	
 	sparql.setQuery(query)
 	sparql.setReturnFormat(JSON)
