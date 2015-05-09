@@ -17,42 +17,43 @@
 				<article class="contact-form col-md-8 col-sm-7  page-row">                            
 					<h3 class="title">Join Us</h3>
 					<p>We welcome you to the intelligent tutoring system STIBD, once completed your registration you will be able to start solving your doubts related to Databases. Please just fill out the simple form that follows. </p>
-					<form>
+					<form action="/tutor/registration/" method="post">
+						{% csrf_token %}
 						<div class="form-group name">
 							<label for="name">Name<span class="required">*</span></label>
-							<input id="name" type="text" class="form-control" placeholder="Enter your name">
+							<input name="name" id="name" type="text" class="form-control" placeholder="Enter your name">
 						</div><!--//form-group-->
 						<div class="form-group name">
-							<label for="name">Lastname<span class="required">*</span></label>
-							<input id="name" type="text" class="form-control" placeholder="Enter your lastname">
+							<label for="lastname">Lastname<span class="required">*</span></label>
+							<input name="lastname" id="lastname" type="text" class="form-control" placeholder="Enter your lastname">
 						</div><!--//form-group-->
 						<div class="form-group phone">
-							<label for="phone">University<span class="required">*</span></label>
-							<input id="phone" type="text" class="form-control" placeholder="Enter your University's name">
+							<label for="university">University<span class="required">*</span></label>
+							<input name="university" id="university" type="text" class="form-control" placeholder="Enter your University's name">
 						</div><!--//form-group-->
 						<div class="form-group phone">
-							<label for="phone">University Card<span class="required">*</span></label>
-							<input id="phone" type="text" class="form-control" placeholder="Enter your University Card number">
+							<label for="uc">University Card<span class="required">*</span></label>
+							<input name="uc" id="uc" type="text" class="form-control" placeholder="Enter your University Card number">
 						</div><!--//form-group-->
 						<div class="form-group email">
 							<label for="email">Email<span class="required">*</span></label>
-							<input id="email" type="email" class="form-control" placeholder="Enter your email">
+							<input name="email" id="email" type="email" class="form-control" placeholder="Enter your email">
 						</div><!--//form-group-->
 						<div class="form-group phone">
-							<label for="phone">Country</label>
-							<input id="phone" type="text" class="form-control" placeholder="Enter your Country">
+							<label for="country">Country</label>
+							<input name="country" id="country" type="text" class="form-control" placeholder="Enter your Country">
 						</div><!--//form-group-->
 						<div class="form-group phone">
 							<label for="phone">Phone</label>
-							<input id="phone" type="tel" class="form-control" placeholder="Enter your contact number">
+							<input name="phone" id="phone" type="tel" class="form-control" placeholder="Enter your contact number">
 						</div><!--//form-group-->
 						<div class="form-group phone">
-							<label for="phone">Username<span class="required">*</span></label>
-							<input id="phone" type="text" class="form-control" placeholder="Choose your username">
+							<label for="username">Username<span class="required">*</span></label>
+							<input name="username" id="username" type="text" class="form-control" placeholder="Choose your username">
 						</div><!--//form-group-->
 						<div class="form-group phone">
 							<label for="password">Password<span class="required">*</span></label>
-							<input id="password" type="text" class="form-control" placeholder="Choose a password for your account">
+							<input name="password" id="password" type="text" class="form-control" placeholder="Choose a password for your account">
 						</div><!--//form-group-->
 						<button type="submit" class="btn btn-theme">Register me</button>
 					</form>                  

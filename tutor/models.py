@@ -40,8 +40,11 @@ class UserProfile(models.Model):
 	# This field is required
 	user = models.OneToOneField(User)
 	# Other fields here
+	#user_nombre = models.CharField(max_length=150)
+	#user_apellido = models.CharField(max_length=150)
 	user_carnet = models.CharField(max_length=11, blank=True)
 	user_universidad = models.ForeignKey(Universidad, db_column='user_universidad', null=True)
+	#user_correo = models.CharField(max_length=33, blank=True)
 	user_telefono = models.CharField(max_length=33, blank=True)
 	user_pais = models.IntegerField(null=True, blank=True)
 	user_cambiopass = models.DateField(null=True, blank=True)
@@ -168,20 +171,20 @@ class ContactoForm(forms.Form):
 class RecuperarForm(forms.Form):
 	email = forms.EmailField(widget=forms.TextInput(attrs={'class':'inputbox05 submit','placeholder':'Correo Electrónico'}), max_length=150,)
 	
-class AseguradoForm(forms.Form):
+class RegistroForm(forms.Form):
 	SEXO_CHOICES = (('M','Masculino',),('F','Femenino',))
-	CI_CHOICES = (('V', 'V',),('E', 'E',),('M', 'M',))
-	COL_CHOICES = (('1', 'Colectivo',),('2', 'Particular',))
-	nombre = forms.CharField(max_length=50, widget=forms.TextInput(attrs={'class':'inputbox05white'}))
-	apellido = forms.CharField(max_length=50, widget=forms.TextInput(attrs={'class':'inputbox05white'}))
-	sexo = forms.ChoiceField(choices=SEXO_CHOICES,label='Sexo',widget=forms.Select(attrs={'class':'selectbox01','size':'1'}) )
-	tipo_ci = forms.ChoiceField(choices=CI_CHOICES,label='', widget=forms.RadioSelect(attrs={}))
-	ci = forms.CharField(label='Cédula', max_length=11, widget=forms.TextInput(attrs={'class':'inputbox05white positive-integer'}))
-	birthdate = forms.DateField(label='Fecha de Nacimiento', widget=forms.DateInput(format='%d/%m/%Y',attrs={'class':'inputbox01 datePicker',}),input_formats=('%d/%m/%Y',))
-	particular = forms.BooleanField(label='Particular',initial=False,required=False)
-	colectivo_nombre = forms.CharField(label='Colectivo', max_length=50, widget=forms.TextInput(attrs={'class':'inputbox02'}),required=False)
-	colectivo_check = forms.CharField(required=False,widget=forms.HiddenInput(attrs={}))
-	colectivo = forms.IntegerField(initial=-1,widget=forms.HiddenInput(attrs={}))
+	#CI_CHOICES = (('V', 'V',),('E', 'E',),('M', 'M',))
+	nombre = forms.CharField(label='Name',max_length=50, widget=forms.TextInput(attrs={'class':'form-control','placeholder':'Enter your name'}))
+	apellido = forms.CharField(label='Lastname',max_length=50, widget=forms.TextInput(attrs={'class':'form-control','placeholder':'Enter your lastname'}))
+	sexo = forms.ChoiceField(label='Sex',choices=SEXO_CHOICES,widget=forms.Select(attrs={'class':'selectbox01','size':'1'}) )
+	universidad = forms.CharField(label='University', max_length=50, widget=forms.TextInput(attrs={'class':'form-control','placeholder':'Enter your University'}),required=False)
+	uc = forms.CharField(label='University Card', max_length=11, widget=forms.TextInput(attrs={'class':'form-control','placeholder':'Enter your University Card number'}))
+	birthdate = forms.DateField(label='Birthdate', widget=forms.DateInput(format='%d/%m/%Y',attrs={'class':'inputbox01 datePicker',}),input_formats=('%d/%m/%Y',))
+	correo = forms.EmailField(label='Email', widget=forms.TextInput(attrs={'class':'form-control','placeholder':'Enter your Email'}), max_length=150,)
+	pais = forms.CharField(label='Country', max_length=50, widget=forms.TextInput(attrs={'class':'form-control','placeholder':'Enter your Country'}),required=False)
+	telefono = forms.IntegerField(label='Phone',widget=forms.TextInput(attrs={'class':'form-control','placeholder':'Enter your contact phone number'}))
+	user = forms.CharField(label='Username',max_length=50, widget=forms.TextInput(attrs={'class':'form-control','placeholder':'Choose your username'}))
+	password = forms.CharField(label='Password',widget=forms.TextInput(attrs={'class':'form-control','placeholder':'Choose a password for your account'}))
 	usuario = forms.IntegerField(widget=forms.HiddenInput(attrs={}))
 	
 class TutorForm(forms.Form):

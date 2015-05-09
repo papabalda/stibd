@@ -8,6 +8,7 @@ from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.template import RequestContext
 from django.contrib import messages
+from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.sessions.models import Session
@@ -284,15 +285,76 @@ def contact(request):
 	return render_to_response('tutor/index1.html', {'vista': 'contact'}, RequestContext(request))	
 	
 def faq(request):
-
+	faq_dict = []
+	try:
+		lista = Pregunta.objects.select_related('descripcion').filter(nombre=university,).order_by('ocurrencias')
+		faq = [pregunta for pregunta in lista[10]]
+		for question in faq:
+			try:
+				answer = Respuesta.objects.select_related('descripcion').get(pregunta = question)
+				faq_dict[question.descripcion] = answer.descripcion
+			except:
+				answer = None
+	except:
+		pass
+		
 	# if autenticado index2
-	return render_to_response('tutor/index1.html', {'vista': 'faq'}, RequestContext(request))	
+	return render_to_response('tutor/index1.html', {'vista': 'faq', 'faq':faq_dict}, RequestContext(request))	
 
 def register(request):
-
+	form = RegistroForm()
 	# if autenticado index2
-	return render_to_response('tutor/index1.html', {'vista': 'register'}, RequestContext(request))	
-	
+	return render_to_response('tutor/index1.html', {'vista': 'register','form':form}, RequestContext(request))	
+
+def register_call(request):
+
+	try:
+		name = request.POST.get('name',None)
+		lastname = request.POST.get('lastname',None)
+		#sex = request.POST.get('sex',None)
+		university = request.POST.get('university',None)
+		uc = request.POST.get('uc',None)
+		#birthdate = request.POST.get('birthdate',None)
+		email = request.POST.get('email',None)
+		country = request.POST.get('country',None)
+		phone = request.POST.get('phone',None)
+		username = request.POST.get('username',None)
+		password = request.POST.get('password',None)
+	except:
+		message = "Registration incomplete, please complete required fields"
+		return redirect('/register',request,message)
+	print "asd ", name, lastname, university, uc, email, country, phone, username, password, "  done"
+
+	try:
+		print 'Registrando!'
+		user = User.objects.create_user(username, email, password)
+		user.first_name = name
+		user.last_name = lastname
+		user.save()
+		print "user there"
+	except Exception as e:
+		print "error ", e.message
+		message = "Registration Error, please try again later"
+		return redirect('/register',request,message)
+		
+	try:
+		uni_obj = Universidad.objects.select_related('nombre').get(nombre=university)
+	except:
+		#Condicionable
+		#uni_obj = Universidad(nombre=university)
+		#uni_obj.save()
+		uni_obj = None
+		
+	try:	
+		profile = UserProfile(user_carnet = uc, user_universidad = uni_obj, user_telefono = phone, user_pais = 1)
+		profile.save()
+		message = "Registration Complete"
+		return redirect('/',request,message)
+	except:
+		return redirect('/',request)
+		
+	return redirect('/',request)		
+		
 def home(request):
 	'''
 	start = timeit.default_timer()

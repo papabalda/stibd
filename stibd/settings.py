@@ -173,6 +173,9 @@ LOGGING = {
         },
     }
 }
+
+AUTH_PROFILE_MODULE = "tutor.UserProfile"
+
 # LOCAL SETTINGS
 # Soon
 
