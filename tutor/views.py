@@ -13,6 +13,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.sessions.models import Session
 from django.conf import settings
+from datetime import date
 #NLTK 
 from nltk.tokenize import sent_tokenize, word_tokenize, wordpunct_tokenize
 from nltk.tag import pos_tag
@@ -52,21 +53,27 @@ def sparql_call(query, target):
 	#http://localhost:3030/ds/query   http://dbpedia.org/sparql ab: <http://learningsparql.com/ns/addressbook#>
 	#Ya deberia estar abierto so http://esmar.ldc.usb.ve:3030/ds/query
 	#if sparql is None:
-	sparql = SPARQLWrapper("http://esmar.ldc.usb.ve:3030/ds/query")
-	
-	sparql.setQuery(query)
-	sparql.setReturnFormat(JSON)
-	results = sparql.query().convert()
-	target = target.replace("?", "") 
-	for result in results["results"]["bindings"]:
-		try:
-			first = result[target]["value"]
-			print(result[target]["value"]) 
-		except Exception as e:
-			#first = None
-			print "no pude leer esto", e.message
-	print "\n"
-	return None, None
+	try:
+		sparql = SPARQLWrapper("http://localhost:3030/ds/query")
+		
+		sparql.setQuery(query)
+		sparql.setReturnFormat(JSON)
+		results = sparql.query().convert()
+		target = target.replace("?", "") 
+		for result in results["results"]["bindings"]:
+			try:
+				first = result[target]["value"]
+				print(result[target]["value"]) 
+			except Exception as e:
+				#first = None
+				print "no pude leer esto", e.message
+		print "\n"
+	except:
+		print "no se pudo alcanzar el servidor sparql"
+	try:
+		return first, results
+	except:
+		return None, None
 	#return first, results
 		
 # # # TODO Funcion para interpretar las preguntas realizadas y llevarlas a tripletas a cnsultar. Luego usar sparql call y 
@@ -120,7 +127,7 @@ def my_ajax(request):
 	else:
 		raise Http404
 
-def taxonomy_search(question):
+def taxonomy_search(question): #funcion para buscar preguntas alternativas. TODO
 	if "what is a subclass" in question:
 		return "what is a class?","definition of class"
 	return None, None	
@@ -146,14 +153,15 @@ def alternative_ajax(request):
 		print " ajax request fails"
 		raise Http404
 
-
+@login_required
 def question_ajax(request):
 	if request.is_ajax():
 		question = request.POST.get('question', None)
+		user_id = request.user.id
+		user = User.objects.get(pk=user_id)
 		print str(question)
 		try:
-			# Funcion que determine si hay una pregunta similar
-		
+			
 			# Variable global para mantener la conexion a quepy.. Tal vez no sea necesario
 			#if QUEPY_STIBD is None:
 			QUEPY_STIBD = quepy.install("quepy_stibd")	
@@ -164,13 +172,42 @@ def question_ajax(request):
 			# run query
 			print query
 			try:
+				pregunta = Pregunta.objects.get(descripcion__icontains = str(question))
+				pregunta.ocurrencias = pregunta.ocurrencias + 1
+				pregunta.save()
+			except Exception as e:
+				print "que paso ", e.message
+				pregunta = Pregunta(descripcion = str(question))
+				pregunta.save()
+			print "almacenada pregunta"
+			try:
+				pe = PreguntaEstudiante(usuario = user, descripcion = str(question),fecha = date.today() ,pregunta = pregunta)
+				pe.save()
+			except Exception as e:
+				print "aca ", e.message
+				pe = PreguntaEstudiante(usuario = user, descripcion = str(question),fecha = date.today() ,pregunta = pregunta)
+				pe.save()
+				
+			try:
 				first, results = sparql_call(query,target)
+				try:
+					respuesta = Respuesta.objects.get(descripcion__icontains = first)
+				except Exception as e:
+					respuesta = Respuesta(descripcion = first,pregunta = pregunta)
+					respuesta.save()
+				'''
+				try:
+					respuesta = Respuesta(descripcion = first,pregunta = pregunta)
+					respuesta.save()
+				except Exception as e:
+					print e.message
+				'''	
 				return HttpResponse(json.JSONEncoder().encode({"exito":1,"respuesta":first}), mimetype="application/json")
 			except Exception as e:
 				print e.message
 				raise Http404
-		except:
-			print " quepy install fails"
+		except Exception as e:
+			print " quepy install fails ", repr(e), e.message
 			return HttpResponse(json.JSONEncoder().encode({"error":"No se pudo procesar la pregunta"}), mimetype="application/json")
 			#raise Http404
 	else:
@@ -287,7 +324,7 @@ def contact(request):
 def faq(request):
 	faq_dict = []
 	try:
-		lista = Pregunta.objects.select_related('descripcion').filter(nombre=university,).order_by('ocurrencias')
+		lista = Pregunta.objects.select_related('descripcion').all().order_by('ocurrencias')
 		faq = [pregunta for pregunta in lista[10]]
 		for question in faq:
 			try:
@@ -428,6 +465,7 @@ def logout_call(request):
 	
 @login_required(login_url='/')
 def index(request):
+	print request.user.id
 	'''
 	user = request.user
 	profile = user.get_profile()
@@ -443,7 +481,7 @@ def detail(request, poll_id):
 def results(request, poll_id):
     p = get_object_or_404(Poll, pk=poll_id)
     return render_to_response('tutor/results.html', {'poll': p})
-'''
+	
 def vote(request, poll_id):
     p = get_object_or_404(Poll, pk=poll_id)
     try:
@@ -462,3 +500,4 @@ def vote(request, poll_id):
         # user hits the Back button.
         #return HttpResponseRedirect(reverse('tutor.views.results', args=(p.id,)))	
         return HttpResponseRedirect(reverse('poll_results', args=(p.id,)))
+'''

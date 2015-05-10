@@ -9,7 +9,7 @@ from django.utils import timezone
 # Create your models here.
 
 class Universidad(models.Model):
-    id = models.IntegerField(primary_key=True)
+    #id = models.IntegerField(primary_key=True)
     nombre = models.CharField(max_length=150)
     siglas = models.CharField(max_length=10)
     telefono = models.CharField(max_length=15, blank=True)
@@ -18,6 +18,7 @@ class Universidad(models.Model):
     class Meta:
         db_table = u'universidad'
 
+'''		
 class StibdUsuario(models.Model):
     user_id = models.IntegerField(primary_key=True)
     user_mail = models.CharField(max_length=300)
@@ -34,7 +35,7 @@ class StibdUsuario(models.Model):
     user_cambiopass = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'stibd_usuario'
-		
+'''		
 #Perfil con los datos Adicionales de Usuario
 class UserProfile(models.Model):
 	# This field is required
@@ -51,7 +52,8 @@ class UserProfile(models.Model):
 	session_key = models.CharField(max_length=40,null=True, blank=True)
 	def __unicode__(self):
 		return self.user.username
-		
+
+'''		
 class PerfilPersona(models.Model):
 	id = models.AutoField(primary_key=True)
 	SEXO = (('M','Masculino'),('F','Femenino'))
@@ -63,7 +65,7 @@ class PerfilPersona(models.Model):
 		db_table = u'perfil_persona'
 	def __unicode__(self):
 		return self.user_profile.user.username
-
+'''
 def create_user_profile(sender, instance, created, **kwargs):
 	if created:
 		UserProfile.objects.create(user=instance)
@@ -71,46 +73,36 @@ def create_user_profile(sender, instance, created, **kwargs):
 # Si se crea un usuario, se crea el UserProfile común
 post_save.connect(create_user_profile, sender=User)
 
-class StibdPasswd(models.Model):
-	id_pass = models.IntegerField(primary_key=True)
-	codigo = models.CharField(max_length=96)
-	fecha_exp = models.DateTimeField()
-	user = models.ForeignKey(StibdUsuario)
-	class Meta:
-		db_table = u'stibd_passwd'
 		
-class Poll(models.Model):
-	question = models.CharField(max_length=200)
-	pub_date = models.DateTimeField('date published')
-	def __unicode__(self):
-		return self.question
-	def was_published_recently(self):
-		return self.pub_date >= timezone.now() - datetime.timedelta(days=1)
-	was_published_recently.admin_order_field = 'pub_date'
-	was_published_recently.boolean = True
-	was_published_recently.short_description = 'Published recently?'
-
-class Choice(models.Model):
-	poll = models.ForeignKey(Poll)
-	choice = models.CharField(max_length=200)
-	votes = models.IntegerField()
-	def __unicode__(self):
-		return self.choice
-
-# Clase para las preguntas formuladas por los estudiantes		
+# Clase para las preguntas totalizadas		
 class Pregunta(models.Model):
-	pregunta_id = models.IntegerField(primary_key=True)
-	usuario = models.ForeignKey(StibdUsuario, db_column='usuario')
+	#pregunta_id = models.IntegerField(primary_key=True)
+	#usuario = models.ForeignKey(StibdUsuario, db_column='usuario')
 	descripcion = models.CharField(max_length=1000)	# Descripcion en lenguaje natural de la pregunta
+	ocurrencias = models.IntegerField(default=1)
 	#composicion = models.ForeignKey(Tripleta, db_column='composicion') # Descripcion estructura en triple(sparql) de la pregunta
 	class Meta:
 		db_table = u'pregunta'
 	def __unicode__(self):
 		return self.choice
 
+# Clase para las preguntas formuladas por los estudiantes		
+class PreguntaEstudiante(models.Model):
+	#pe_id = models.IntegerField(primary_key=True)
+	usuario = models.ForeignKey(User, db_column='usuario')
+	#usuario = models.OneToOneField(User)#models.ForeignKey(StibdUsuario, db_column='usuario')
+	descripcion = models.CharField(max_length=1000)	# Descripcion en lenguaje natural de la pregunta
+	fecha = models.DateField(null=True, blank=True)
+	pregunta = models.ForeignKey(Pregunta, db_column='pregunta')
+	#composicion = models.ForeignKey(Tripleta, db_column='composicion') # Descripcion estructura en triple(sparql) de la pregunta
+	class Meta:
+		db_table = u'pregunta_estudiante'
+	def __unicode__(self):
+		return self.choice
+		
 # Clase para las respuestas a preguntas frecuentes formuladas por los estudiantes	
 class Respuesta(models.Model):
-	respuesta_id = models.IntegerField(primary_key=True)
+	#respuesta_id = models.IntegerField(primary_key=True)
 	pregunta = models.ForeignKey(Pregunta, db_column='pregunta')
 	descripcion = models.CharField(max_length=1000)	# Descripcion en lenguaje natural de la Respuesta
 	rating = models.IntegerField(default=3)
@@ -120,7 +112,30 @@ class Respuesta(models.Model):
 	def __unicode__(self):
 		return self.choice
 	
-	
+# Clase para las preguntas formuladas por los estudiantes		
+class Evento(models.Model):
+	#evento_id = models.IntegerField(primary_key=True)
+	#usuario = models.ForeignKey(StibdUsuario, db_column='usuario')
+	titulo = models.CharField(max_length=100)	
+	ubicacion = models.CharField(max_length=100)	
+	fecha = models.DateField(null=True, blank=True)
+	class Meta:
+		db_table = u'evento'
+	def __unicode__(self):
+		return self.choice
+
+# Clase para las preguntas formuladas por los estudiantes		
+class Noticia(models.Model):
+	#noticia_id = models.IntegerField(primary_key=True)
+	#usuario = models.ForeignKey(StibdUsuario, db_column='usuario')
+	titulo = models.CharField(max_length=100)	
+	contenido = models.CharField(max_length=1000)	
+	fechapub = models.DateField(null=True, blank=True)
+	class Meta:
+		db_table = u'noticia'
+	def __unicode__(self):
+		return self.choice
+		
 #Formularios
 class InformesForm(forms.Form):
 
