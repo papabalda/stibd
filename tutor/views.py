@@ -51,10 +51,10 @@ def normalization(text):
 	
 def sparql_call(query, target):
 	#http://localhost:3030/ds/query   http://dbpedia.org/sparql ab: <http://learningsparql.com/ns/addressbook#>
-	#Ya deberia estar abierto so http://esmar.ldc.usb.ve:3030/ds/query
+	#Ya deberia estar abierto so http://esmar.ldc.usb.ve:3030/ds/query  http://localhost:3030/ds/query
 	#if sparql is None:
 	try:
-		sparql = SPARQLWrapper("http://localhost:3030/ds/query")
+		sparql = SPARQLWrapper("http://esmar.ldc.usb.ve:3030/ds/query")
 		
 		sparql.setQuery(query)
 		sparql.setReturnFormat(JSON)
@@ -128,8 +128,8 @@ def my_ajax(request):
 		raise Http404
 
 def taxonomy_search(question): #funcion para buscar preguntas alternativas. TODO
-	if "what is a subclass" in question:
-		return "what is a class?","definition of class"
+	if "what is a key?" in question:
+		return "what is a primary_key?","Primary key is the candidate key selected to be primary key."
 	return None, None	
 		
 def alternative_ajax(request):
